@@ -11,7 +11,7 @@ const app = express()
 
 app.use(express.json())
 app.use(cors({
-    origin : "http://localhost:3000"
+    origin : "*"
 }))
 app.use(bodyParser.json({ limit: '20mb' }));  // for large Base64 data
 app.use(bodyParser.urlencoded({ limit: '20mb', extended: true }));
@@ -137,4 +137,4 @@ app.get("/getSprite", (request, response) => {
 
 
 
-app.listen(process.env.port, () => console.log("server is listening........." + process.env.REACT_APP_API_KEY))
+app.listen(process.env.port, () => console.log("server is listening........." + process.env.apiKey))
