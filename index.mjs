@@ -39,21 +39,12 @@ app.post("/upload", upload.single('file'), (request, response) => {
 })
 
 let pokemonSprites = [
-    { name: "Pidgeot", sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/18.png" },
-    { name: "Rattata", sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/19.png" },
-    { name: "Ekans", sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/23.png" },
-    { name: "Arbok", sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/24.png" },
-    { name: "Jigglypuff", sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/39.png" },
-    { name: "Zubat", sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/41.png" },
-    { name: "Venonat", sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/48.png" },
-    { name: "Diglett", sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/50.png" },
-    { name: "Dugtrio", sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/51.png" },
-    { name: "Poliwhirl", sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/53.png" },
+   
 ];
 
 
 
-const genAI = new GoogleGenerativeAI("AIzaSyBdrJMVA-cG86Dj3dJIskhB0DsCbo7CwFk");
+const genAI = new GoogleGenerativeAI(process.env.apiKey);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 app.post("/getPokemonData", upload.single('file') ,async (request, response) => {
@@ -146,4 +137,4 @@ app.get("/getSprite", (request, response) => {
 
 
 
-app.listen(4000, () => console.log("server is listening........."))
+app.listen(process.env.port, () => console.log("server is listening........." + process.env.REACT_APP_API_KEY))
