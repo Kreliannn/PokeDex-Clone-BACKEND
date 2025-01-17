@@ -5,6 +5,8 @@ import { GoogleGenerativeAI }from "@google/generative-ai"
 import fs from "fs";
 import path from "path";
 import bodyParser from "body-parser";
+import multer from "multer";
+
 const app = express()
 
 app.use(express.json())
@@ -13,6 +15,28 @@ app.use(cors({
 }))
 app.use(bodyParser.json({ limit: '20mb' }));  // for large Base64 data
 app.use(bodyParser.urlencoded({ limit: '20mb', extended: true }));
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+      cb(null, "uploads/");  // Folder to save the uploaded files
+    },
+    filename: (req, file, cb) => {
+      // Get the file extension (e.g., .jpg, .png)
+      const ext = path.extname(file.originalname).toLowerCase();
+      
+      // Generate a unique filename with timestamp and the file extension
+      const filename = Date.now() + ext;
+  
+      cb(null, filename);  // Save with new filename
+    }
+  });
+
+const upload = multer({ storage : storage})
+
+
+app.post("/upload", upload.single('file'), (request, response) => {
+    response.send(request.file.filename)
+})
 
 let pokemonSprites = [
     { name: "Pidgeot", sprite: "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/18.png" },
@@ -32,42 +56,31 @@ let pokemonSprites = [
 const genAI = new GoogleGenerativeAI("AIzaSyBdrJMVA-cG86Dj3dJIskhB0DsCbo7CwFk");
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-app.post("/getPokemonData", async (request, response) => {
+app.post("/getPokemonData", upload.single('file') ,async (request, response) => {
     
-    let img = request.body
-    let validImg = Object.keys(img)[0]
-    let base64 =  validImg.split(',')[1];
-    //const base64Image = img.split(',')[1]; // Get only the Base64 part
 
-    console.log(base64)
-    response.send(base64)
-    
-    /*
-    const imagePath = path.resolve("./charixzarfd.png");
-
-    // Read the image as a base64-encoded string
+    let fileName = request.file.filename
+    const imagePath = path.resolve("uploads/" + fileName);
     const imageData = fs.readFileSync(imagePath).toString("base64");
-
-    console.log(imageData) 
-
-  
     
-    
+    console.log(fileName)
+
     try {
         
         const imgChecker = await model.generateContent([
             {
                 inlineData: {
-                    data: base64,
+                    data: imageData,
                     mimeType: "image/png", // Ensure the correct MIME type (e.g., "image/png" for PNG images)
                 },
             },
-            "is this a pokemon? if yes return the name of the pokemon name in lowercase, if not pokemon return 'not pokemon'",
+            "is this a pokemon? if yes return the name of the pokemon name in lowercase, if not pokemon return 'not pokemon' do not return any other string.",
         ]);
 
+      
         let isPokemon = imgChecker.response.text()
 
-        console.log(isPokemon)
+        console.log("name: " + isPokemon)
 
         if(isPokemon == "not pokemon") throw new Error("error")
     
@@ -103,13 +116,13 @@ app.post("/getPokemonData", async (request, response) => {
         }
         
   
-        response.send(pokemonData)
+        response.send(pokemonData) 
 
     } catch (err) {
         console.log(err)
         response.status(500).send("error")
     }   
-    */
+    
 })
 
 app.post("/chatBot", async (request, response) => {
