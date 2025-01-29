@@ -6,7 +6,9 @@ import fs from "fs";
 import path from "path";
 import bodyParser from "body-parser";
 import multer from "multer";
+import dotenv from "dotenv"
 
+dotenv.config()
 const app = express()
 
 app.use(express.json())
