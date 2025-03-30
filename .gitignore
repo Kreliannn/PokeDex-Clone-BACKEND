@@ -17,7 +17,6 @@ yarn-error.log*
 Thumbs.db
 
 # IDEs and editors
-.vscode/
 .idea/
 
 # npm package lock file (optional)
